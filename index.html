@@ -1,33 +1,29 @@
-<!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
     <meta charset="utf-8">
-    <title>Spacewar!</title>
+    <title>TITLE</title>
     <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            width: 100%;
-            height: 100%;
-        }
+        html,
+        body,
         canvas {
-            display: block;
-            width: 100%;
-            height: 100%;
+            margin: 0px;
+            padding: 0px;
+            width: 800px;
+            height: 600px;
+            overflow: hidden;
+            position: absolute;
+            background: black;
+            z-index: 0;
         }
     </style>
 </head>
-<body>
-    <script type="module">
-        // Import the WASM module and the `start` function
-        import init, { start } from './static/spacewar_wasm.js';
 
-        // Initialize the WASM module
-        init().then(() => {
-            // Start the game
-            start();
-        });
-    </script>
+<body>
+    <canvas id="glcanvas" tabindex='1'></canvas>
+    <!-- Minified and statically hosted version of https://github.com/not-fl3/macroquad/blob/master/js/mq_js_bundle.js -->
+    <script src="https://not-fl3.github.io/miniquad-samples/gl.js"></script>
+    <script>load("sp.wasm");</script> <!-- Your compiled wasm file -->
 </body>
+
 </html>
