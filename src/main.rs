@@ -227,7 +227,7 @@ async fn main() {
             if is_key_down(KeyCode::D) {
                 game.player1.angular_velocity += 0.004;
             }
-            if is_key_pressed(KeyCode::Space) {
+            if is_key_down(KeyCode::Space) {
                 game.projectiles.push(
                     Projectile {
                     position: game.player1.position + vec2(game.player1.angle.cos(), game.player1.angle.sin()) * 10.0,
