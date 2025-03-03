@@ -73,7 +73,7 @@ impl Spaceship {
         self.velocity += force;
         self.position += self.velocity;
         self.angle += self.angular_velocity;
-        self.angular_velocity *= 0.95;
+        //self.angular_velocity *= 0.95;
     }
 }
 
