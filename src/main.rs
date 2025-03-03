@@ -109,6 +109,7 @@ impl Projectile {
 
 struct Spacewar {
     player1: Spaceship,
+    player2: Spaceship,
     projectiles: Vec<Projectile>,
     star_position: Vec2,
 }
@@ -117,6 +118,15 @@ impl Spacewar {
         Spacewar {
             player1: Spaceship {
                 position: vec2(100.0, 130.0),
+                velocity: vec2(0.0, 0.0),
+                angular_velocity: 0.0,
+                angle: 0.0,
+                thrust: false,
+                reverse: false,
+                alive: true,
+            },
+            player2: Spaceship {
+                position: vec2(screen_width() - 100.0, 130.0),
                 velocity: vec2(0.0, 0.0),
                 angular_velocity: 0.0,
                 angle: 0.0,
@@ -137,6 +147,7 @@ impl Spacewar {
     }
     fn update(&mut self) {
         self.player1.update(self.star_position);
+        self.player2.update(self.star_position);
         for projectile in self.projectiles.iter_mut() {
             if !projectile.active {
                 continue;
@@ -148,11 +159,17 @@ impl Spacewar {
             if projectile.position.distance(self.player1.position) < 10.0 {
                 self.player1.alive = false;
             }
+            if projectile.position.distance(self.player2.position) < 10.0 {
+                self.player2.alive = false;
+            }
             if !projectile.active {
                 continue;
             }
         }
         if self.player1.position.distance(self.star_position) < 25.0 {
+            self.player1.alive = false;
+        }
+        if self.player2.position.distance(self.star_position) < 25.0 {
             self.player1.alive = false;
         }
     }
@@ -176,8 +193,18 @@ async fn main() {
         game.player1.reverse = false;
         game.player1.alive = true;
         game.projectiles = Vec::new();
+        game.player2.position = vec2(screen_width() - 100.0, 130.0);
+        game.player2.velocity = vec2(0.0, 0.0);
+        game.player2.angular_velocity = 0.0;
+        game.player2.angle = 0.0;
+        game.player2.thrust = false;
+        game.player2.reverse = false;
+        game.player2.alive = true;
         while started{
             if !game.player1.alive {
+                started = false;
+            }
+            if !game.player2.alive {
                 started = false;
             }
             clear_background(BLACK);
@@ -204,6 +231,27 @@ async fn main() {
                     Projectile {
                     position: game.player1.position + vec2(game.player1.angle.cos(), game.player1.angle.sin()) * 10.0,
                     velocity: game.player1.velocity + vec2(game.player1.angle.cos(), game.player1.angle.sin()) * 4.0,
+                    active: true,
+                }
+                )
+            }
+            if is_key_down(KeyCode::Up) {
+                game.player2.thrust = true;
+            }
+            if is_key_down(KeyCode::Down) {
+                game.player2.reverse = true;
+            }
+            if is_key_down(KeyCode::Left) {
+                game.player2.angular_velocity -= 0.004;
+            }
+            if is_key_down(KeyCode::Right) {
+                game.player2.angular_velocity += 0.004;
+            }
+            if is_key_pressed(KeyCode::Enter) {
+                game.projectiles.push(
+                    Projectile {
+                    position: game.player2.position + vec2(game.player2.angle.cos(), game.player2.angle.sin()) * 10.0,
+                    velocity: game.player2.velocity + vec2(game.player2.angle.cos(), game.player2.angle.sin()) * 4.0,
                     active: true,
                 }
                 )
