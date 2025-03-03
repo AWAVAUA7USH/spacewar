@@ -141,6 +141,7 @@ impl Spacewar {
     fn draw(&self) {
         draw_circle(self.star_position.x, self.star_position.y, 20.0, YELLOW);
         self.player1.draw();
+        self.player2.draw();
         for projectile in self.projectiles.iter() {
             projectile.draw();
         }
