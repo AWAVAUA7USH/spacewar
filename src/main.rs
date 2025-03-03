@@ -236,22 +236,22 @@ async fn main() {
                 }
                 )
             }
-            if is_key_down(KeyCode::Up) {
+            if is_key_down(KeyCode::I) {
                 game.player2.thrust = true;
             }
             else {
                 game.player2.thrust = false;
             }
-            if is_key_down(KeyCode::Down) {
+            if is_key_down(KeyCode::K) {
                 game.player2.reverse = true;
             }
             else {
                 game.player2.reverse = false;
             }
-            if is_key_down(KeyCode::Left) {
+            if is_key_down(KeyCode::J) {
                 game.player2.angular_velocity -= 0.004;
             }
-            if is_key_down(KeyCode::Right) {
+            if is_key_down(KeyCode::L) {
                 game.player2.angular_velocity += 0.004;
             }
             if is_key_pressed(KeyCode::Enter) {
