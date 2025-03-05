@@ -1,274 +1,130 @@
 use macroquad::prelude::*;
-
-const GRAVITY_STRENGTH: f32 = 300.0;
-
 struct Spaceship {
     position: Vec2,
     velocity: Vec2,
-    angular_velocity: f32,
     angle: f32,
-    reverse: bool,
-    thrust: bool,
-    alive: bool,
-}
-impl Spaceship {
-    fn draw(&self) {
-        let color = if self.thrust { GREEN } else { WHITE };
-        let color = if self.reverse { RED } else { color };
-        
-        let cangle = self.angle.to_degrees() + 90.0;
-        let cangle = cangle.to_radians();
-        
-        let nose = vec2(0.0, -20.0);
-        let left = vec2(-6.0, 6.0);
-        let right = vec2(6.0, 6.0);
-    
-        let rotated_nose = vec2(
-            nose.x * cangle.cos() - nose.y * cangle.sin(),
-            nose.x * cangle.sin() + nose.y * cangle.cos(),
-        );
-        let rotated_left = vec2(
-            left.x * cangle.cos() - left.y * cangle.sin(),
-            left.x * cangle.sin() + left.y * cangle.cos(),
-        );
-        let rotated_right = vec2(
-            right.x * cangle.cos() - right.y * cangle.sin(),
-            right.x * cangle.sin() + right.y * cangle.cos(),
-        );
-    
-        let nose_position = self.position + rotated_nose;
-        let left_position = self.position + rotated_left;
-        let right_position = self.position + rotated_right;
-    
-        draw_triangle(nose_position, left_position, right_position, color);
-    }
-    fn update(&mut self, star_position: Vec2) {
-        if self.thrust {
-            self.velocity += vec2(self.angle.cos(), self.angle.sin()) * 0.01;
-        }
-        if self.reverse {
-            self.velocity -= vec2(self.angle.cos(), self.angle.sin()) * 0.01;
-        }
-        if(self.position.x > screen_width()) {
-            self.position.x = 0.0;
-        }
-        if(self.position.x < 0.0) {
-            self.position.x = screen_width();
-        }
-        if(self.position.y > screen_height()) {
-            self.position.y = 0.0;
-        }
-        if(self.position.y < 0.0) {
-            self.position.y = screen_height();
-        }
-
-        let direction = star_position - self.position;
-
-        let distance = direction.length().max(10.0);
-
-        let direction_unit = direction / distance;
-
-        let force = direction_unit * (GRAVITY_STRENGTH / distance.powi(2));
-
-        self.velocity += force;
-        self.position += self.velocity;
-        self.angle += self.angular_velocity;
-        //self.angular_velocity *= 0.95;
-    }
-}
-
-struct Projectile {
-    position: Vec2,
-    velocity: Vec2,
+    angular_velocity: f32,d
     active: bool,
 }
-impl Projectile {
-    fn draw(&self) {
-        if self.active {
-            draw_circle(self.position.x, self.position.y, 2.0, RED);
-        }
+impl Spaceship {
+    fn draw(&self){
+        nose = Vec2((0*cos(self.angle)+10*sin(self.angle)),(o*sin(self.angle)+10*cos(self.angle)));
+        right_wing = Vec2((5*cos(self.angle)+5*sin(self.angle)),(5*sin(self.angle)+5*cos(self.angle)));
+        left_wing = Vec2((-5*cos(self.angle)+-5*sin(self.angle)),(-5*sin(self.angle)+-5*cos(self.angle)));
+        draw_triangle( self.position + nose, self.position + right_wing, self.position + left_wing, WHITE);
     }
-    fn update(&mut self, star_position: Vec2) {
-        if !self.active {
-            return;
-        }
-        let direction = star_position - self.position;
-
-        let distance = direction.length().max(10.0);
-
-        let direction_unit = direction / distance;
-
-        let force = direction_unit * (GRAVITY_STRENGTH / distance.powi(2));
-        self.velocity += force;
-        self.position += self.velocity;
-        if self.position.x > screen_width() || self.position.x < 0.0 || self.position.y > screen_height() || self.position.y < 0.0 {
-            self.active = false;
-        }
+    fn accel(&mut self) {
+        self.velocity += Vec2(0.0, 0.1);
+    }
+    fn rotate_left(&mut self) {
+        self.angle -= 0.1;
+    }
+    fn rotate_right(&mut self) {
+        self.angle += 0.1;
+    }
+    fn fire(%mut self, bullets: &mut Vec<Bullet>) {
+        bullets.push(Bullet {
+            position: self.position + Vec2((0*cos(self.angle)+-11*sin(self.angle)),(0*sin(self.angle)+-11*cos(self.angle))),
+            velocity: self.velocity *= 2,
+        });
+    }
+}
+struct Bullet {
+    position: Vec2,
+    velocity: Vec2,
+}
+impl Bullet {
+    fn draw(&self){
+        draw_circle(self.position, 5, WHITE);
     }
 }
 
-struct Spacewar {
-    player1: Spaceship,
-    player2: Spaceship,
-    projectiles: Vec<Projectile>,
-    star_position: Vec2,
+struct Spacewar{
+    player: Vec<Spaceship>,
+    bullets: Vec<Bullet>,
 }
 impl Spacewar {
-    fn new() -> Self {
-        Spacewar {
-            player1: Spaceship {
-                position: vec2(100.0, 130.0),
-                velocity: vec2(0.0, 0.0),
-                angular_velocity: 0.0,
-                angle: 0.0,
-                thrust: false,
-                reverse: false,
-                alive: true,
-            },
-            player2: Spaceship {
-                position: vec2(screen_width() - 100.0, 130.0),
-                velocity: vec2(0.0, 0.0),
-                angular_velocity: 0.0,
-                angle: 0.0,
-                thrust: false,
-                reverse: false,
-                alive: true,
-            },
-            projectiles: Vec::new(),
-            star_position: vec2(screen_width()/2.0, screen_height()/2.0),
+    fn update() {
+        for bullet in self.bullets.iter_mut() {
+            bullet.position += bullet.velocity;
+        }
+        for spaceship in self.player.iter_mut() {
+            if spaceship.thrust {
+                spaceship.velocity += Vec2(0, -0.1);
+            }
+            if spaceship.reverse {
+                spaceship.velocity += Vec2(0, 0.1);
+            }
+            spaceship.position += spaceship.velocity;
+            spaceship.angle += spaceship.angular_velocity;
+            if spaceship.position.x < 0 {
+                spaceship.position.x = screen_width();
+            }
+            if spaceship.position.x > screen_width() {
+                spaceship.position.x = 0;
+            }
+            if spaceship.position.y < 0 {
+                spaceship.position.y = screen_height();
+            }
+            if spaceship.position.y > screen_height() {
+                spaceship.position.y = 0;
+            }
+            for bullet in self.bullets.iter_mut() {
+                if point_in_triangle(bullet.position, spaceship.position + nose, spaceship.position + right_wing, spaceship.position + left_wing) {
+                    self.bullets.remove(bullet);
+                    spaceship.active = false
+                }
+            }
         }
     }
-    fn draw(&self) {
-        draw_circle(self.star_position.x, self.star_position.y, 20.0, YELLOW);
-        self.player1.draw();
-        self.player2.draw();
-        for projectile in self.projectiles.iter() {
-            projectile.draw();
+    fn draw() {
+        for spaceship in self.player.iter() {
+            spaceship.draw();
         }
-    }
-    fn update(&mut self) {
-        self.player1.update(self.star_position);
-        self.player2.update(self.star_position);
-        for projectile in self.projectiles.iter_mut() {
-            if !projectile.active {
-                continue;
-            }
-            projectile.update(self.star_position);
-            if projectile.position.distance(self.star_position) < 25.0 {
-                projectile.active = false;
-            }
-            if projectile.position.distance(self.player1.position) < 10.0 {
-                self.player1.alive = false;
-            }
-            if projectile.position.distance(self.player2.position) < 10.0 {
-                self.player2.alive = false;
-            }
-            if !projectile.active {
-                continue;
-            }
-        }
-        if self.player1.position.distance(self.star_position) < 25.0 {
-            self.player1.alive = false;
-        }
-        if self.player2.position.distance(self.star_position) < 25.0 {
-            self.player1.alive = false;
+        for bullet in self.bullets.iter() {
+            bullet.draw();
         }
     }
 }
 
-#[macroquad::main("Spacewar")]
+#[macroquad::main("Macroquad Blank Page")]
 async fn main() {
-    let mut started: bool = false;
-    let star_position = vec2(screen_width()/2.0, screen_height()/2.0);
-    let gravity_strength = 0.1;
-    let mut game = Spacewar::new();
-    
+    game = Spacewar {}
+    selection = 0;
+    started = false;
     loop {
         clear_background(WHITE);
-        draw_text("Press SPACE to host a server", 20.0, 20.0, 30.0, BLACK);
-        game.player1.position = vec2(100.0, 130.0);
-        game.player1.velocity = vec2(0.0, 0.0);
-        game.player1.angular_velocity = 0.0;
-        game.player1.angle = 0.0;
-        game.player1.thrust = false;
-        game.player1.reverse = false;
-        game.player1.alive = true;
-        game.projectiles = Vec::new();
-        game.player2.position = vec2(screen_width() - 100.0, 130.0);
-        game.player2.velocity = vec2(0.0, 0.0);
-        game.player2.angular_velocity = 0.0;
-        game.player2.angle = 0.0;
-        game.player2.thrust = false;
-        game.player2.reverse = false;
-        game.player2.alive = true;
-        while started{
-            if !game.player1.alive {
-                started = false;
-            }
-            if !game.player2.alive {
-                started = false;
-            }
-            clear_background(BLACK);
-            game.draw();
-            game.update();
-            if is_key_down(KeyCode::W) {
-                game.player1.thrust = true;
-            } else {
-                game.player1.thrust = false;
-            }
-            if is_key_down(KeyCode::S) {
-                game.player1.reverse = true;
-            } else {
-                game.player1.reverse = false;
-            }
-            if is_key_down(KeyCode::A) {
-                game.player1.angular_velocity -= 0.004;
-            }
-            if is_key_down(KeyCode::D) {
-                game.player1.angular_velocity += 0.004;
-            }
-            if is_key_down(KeyCode::Space) {
-                game.projectiles.push(
-                    Projectile {
-                    position: game.player1.position + vec2(game.player1.angle.cos(), game.player1.angle.sin()) * 10.0,
-                    velocity: game.player1.velocity + vec2(game.player1.angle.cos(), game.player1.angle.sin()) * 4.0,
-                    active: true,
-                }
-                )
-            }
-            if is_key_down(KeyCode::I) {
-                game.player2.thrust = true;
-            }
-            else {
-                game.player2.thrust = false;
-            }
-            if is_key_down(KeyCode::K) {
-                game.player2.reverse = true;
-            }
-            else {
-                game.player2.reverse = false;
-            }
-            if is_key_down(KeyCode::J) {
-                game.player2.angular_velocity -= 0.004;
-            }
-            if is_key_down(KeyCode::L) {
-                game.player2.angular_velocity += 0.004;
-            }
-            if is_key_pressed(KeyCode::Enter) {
-                game.projectiles.push(
-                    Projectile {
-                    position: game.player2.position + vec2(game.player2.angle.cos(), game.player2.angle.sin()) * 10.0,
-                    velocity: game.player2.velocity + vec2(game.player2.angle.cos(), game.player2.angle.sin()) * 4.0,
-                    active: true,
-                }
-                )
-            }
-            next_frame().await;
-        }
+        if selection == 0 {
+            draw_text("START", 200, 200, 20, RED);
 
-        next_frame().await;
-        if is_key_pressed(KeyCode::H) {
-            started = true;
+            if key_is_pressed(KeyCode::Enter) {
+                started = true;
+            }
+        }else if selection == 1 {
+            draw_text("START", 200, 200, 20, WHITE);
         }
+        if started {
+            game.players.add(Spaceship);
+        }
+        while started {
+            clear_background(BLACK);
+            if key_is_pressed(KeyCode::W) {
+                game.player[0].accel();
+            }
+            if key_is_pressed(KeyCode::S) {
+                game.player[0].reverse();
+            }
+            if key_is_pressed(KeyCode::A) {
+                game.player[0].rotate_left();
+            }
+            if key_is_pressed(KeyCode::D) {
+                game.player[0].rotate_right();
+            }
+            if key_is_pressed(KeyCode::Space) {
+                game.player[0].fire();
+            }
+            game.update()
+        }
+        next_frame().await;
     }
 }
