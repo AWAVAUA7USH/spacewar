@@ -66,6 +66,7 @@ impl Spaceship {
   }
   fn draw(&self) {
     draw_triangle(self.nose, self.right_wing, self.left_wing, WHITE);
+    draw_circle(self.position.x,self.position.y, 10.0, WHITE);
   }
   fn shoot(&mut self, mut bullets: Vec<Bullet>) {
     bullets.push(Bullet {
