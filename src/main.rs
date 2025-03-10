@@ -172,7 +172,7 @@ async fn main() {
     Spaceship{
       mass: 0.2,
       angle: 0.0,
-      position: vec2(200.0, 200.0),
+      position: vec2(20.0, 20.0),
       nose: vec2(0.0, 0.0),
       right_wing: vec2(0.0, 0.0),
       left_wing: vec2(0.0, 0.0),
@@ -180,6 +180,7 @@ async fn main() {
       angular_velocity: 0.0,
     }
   );
+  spacewar.players[1].update();
   spacewar.star = Star {
     position: vec2(screen_width()*0.5, screen_height()*0.5),
     velocity: vec2(0.0, 0.0),
